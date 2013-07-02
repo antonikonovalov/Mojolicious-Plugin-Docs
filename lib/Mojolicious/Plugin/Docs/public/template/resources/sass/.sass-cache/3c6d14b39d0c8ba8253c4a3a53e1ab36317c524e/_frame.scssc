@@ -1,0 +1,745 @@
+3.1.1 (Brainy Betty)
+d005ae016e5905b5fe3dbd6b065aa650b033990a
+o:Sass::Tree::RootNode
+:
+@linei:@template"]@function pad($radius) {
+    $radius: boxmax($radius);
+    $radius: parseint($radius);
+    @if $radius >= 10 {
+        @return $radius;
+    }
+    @else {
+        @return "0" + $radius;
+    }
+}
+
+@mixin x-frame(
+    $cls,
+    $ui: null,
+    $border-radius: 0px,
+    $border-width: 0px,
+    $padding: null,
+    $background-color: null,
+    $background-gradient: null,
+    $table: false,
+    $background-direction: top
+) {
+    $cls-ui: $cls;
+    @if $ui != null {
+        $cls-ui: $cls + '-' + $ui;
+    }
+
+    $vertical: false;
+    @if $background-direction == left or $background-direction == right {
+        $vertical: true;
+    }
+
+    $frame-top: max(top($border-radius), right($border-radius));
+    $frame-right: max(right($border-radius), bottom($border-radius));
+    $frame-bottom: max(bottom($border-radius), left($border-radius));
+    $frame-left: max(left($border-radius), top($border-radius));
+
+    $padding-top: 0;
+    $padding-right: 0;
+    $padding-bottom: 0;
+    $padding-left: 0;
+
+    @if $padding == null {
+        $padding-top: $frame-top - top($border-width);
+        $padding-right: $frame-right - right($border-width);
+        $padding-bottom: $frame-bottom - bottom($border-width);
+        $padding-left: $frame-left - left($border-width);
+    }
+    @else {
+        $padding-top: top($padding);
+        $padding-right: right($padding);
+        $padding-bottom: bottom($padding);
+        $padding-left: left($padding);
+    }
+
+    @if $padding-top < $frame-top {
+        $padding-top: $frame-top - top($border-width);
+    }
+    @if $padding-right < $frame-right {
+        $padding-right: $frame-right - right($border-width);
+    }
+    @if $padding-bottom < $frame-bottom {
+        $padding-bottom: $frame-bottom - bottom($border-width);
+    }
+    @if $padding-left < $frame-left {
+        $padding-left: $frame-left - left($border-width);
+    }
+
+    .#{$prefix}#{$cls-ui} {
+        @if $supports-border-radius {
+            @if length($border-radius) == 2 {
+                @include border-top-left-radius(nth($border-radius, 1));
+                @include border-top-right-radius(nth($border-radius, 2));
+            } @else if length($border-radius) == 3 {
+                @include border-top-left-radius(nth($border-radius, 1));
+                @include border-top-right-radius(nth($border-radius, 2));
+                @include border-bottom-right-radius(nth($border-radius, 3));
+            } @else if length($border-radius) == 4 {
+                @include border-top-left-radius(nth($border-radius, 1));
+                @include border-top-right-radius(nth($border-radius, 2));
+                @include border-bottom-right-radius(nth($border-radius, 3));
+                @include border-bottom-left-radius(nth($border-radius, 4));
+            } @else {
+                @include border-radius($border-radius);
+            }
+        }
+        padding: $padding-top $padding-right $padding-bottom $padding-left;
+        border-width: $border-width;
+        border-style: solid;
+        @if $background-color != null {
+            @if $supports-gradients and $background-gradient != null {
+                @include background-gradient($background-color, $background-gradient, $background-direction);
+            }
+            @else {
+                background-color: $background-color;
+            }
+        }
+    }
+
+    @if not $supports-gradients or $compile-all {
+        .#{$prefix}nlg {
+            .#{$prefix}#{$cls-ui}-mc {
+                @if $background-gradient != null {
+                    background-image: theme-background-image($theme-name, '#{$cls}/#{$cls-ui}-bg.gif', false, $relative-image-path-for-uis);
+                }
+                @if $background-color != null {
+                    background-color: $background-color;
+                }
+            }
+        }
+    }
+
+    @if not $supports-border-radius or $compile-all {
+        .#{$prefix}nbr {
+            .#{$prefix}#{$cls-ui} {
+                padding: 0 !important;
+                border-width: 0 !important;
+                @include border-radius(0px);
+                @if $background-color != null {
+                    background-color: transparent;
+                }
+                @else {
+                    background: #fff;
+                }
+
+                $type: '100';
+                @if $table == true {
+                    $type: '110';
+                }
+                $direction: '100';
+                @if $vertical == true {
+                    $direction: '110';
+                }
+
+                $left: $type + pad(top($border-radius)) + pad(right($border-radius)) + 'px';
+                $top: $direction + pad(bottom($border-radius)) + pad(left($border-radius)) + 'px';
+                background-position: unquote($left) unquote($top);
+            }
+
+            .#{$prefix}#{$cls-ui}-tl,
+            .#{$prefix}#{$cls-ui}-bl,
+            .#{$prefix}#{$cls-ui}-tr,
+            .#{$prefix}#{$cls-ui}-br,
+            .#{$prefix}#{$cls-ui}-tc,
+            .#{$prefix}#{$cls-ui}-bc,
+            .#{$prefix}#{$cls-ui}-ml,
+            .#{$prefix}#{$cls-ui}-mr {
+                zoom:1;
+
+                @if $background-color != transparent {
+                    background-image: theme-background-image($theme-name, '#{$cls}/#{$cls-ui}-corners.gif', false, $relative-image-path-for-uis);
+                }
+            }
+
+            @if $vertical == true {
+                .#{$prefix}#{$cls-ui}-tc,
+                .#{$prefix}#{$cls-ui}-bc {
+                    zoom:1;
+
+                    @if $background-color != transparent {
+                        background-image: theme-background-image($theme-name, '#{$cls}/#{$cls-ui}-sides.gif', false, $relative-image-path-for-uis);
+                        background-position: 0 0;
+                        background-repeat: repeat-x;
+                    }
+                }
+            } @else {
+                .#{$prefix}#{$cls-ui}-ml,
+                .#{$prefix}#{$cls-ui}-mr {
+                    zoom:1;
+
+                    @if $background-color != transparent {
+                        background-image: theme-background-image($theme-name, '#{$cls}/#{$cls-ui}-sides.gif', false, $relative-image-path-for-uis);
+                        background-position: 0 0;
+                        @if $background-gradient == null {
+                            background-repeat: repeat-y;
+                        }
+                    }
+                }
+            }
+
+            $padding-top: $padding-top - $frame-top + top($border-width);
+            $padding-right: $padding-right - $frame-right + right($border-width);
+            $padding-bottom: $padding-bottom - $frame-bottom + bottom($border-width);
+            $padding-left: $padding-left - $frame-left + left($border-width);
+
+
+            @if $padding-top < 0 {
+                $padding-top: 0;
+            }
+            @if $padding-right < 0 {
+                $padding-right: 0;
+            }
+            @if $padding-bottom < 0 {
+                $padding-bottom: 0;
+            }
+            @if $padding-left < 0 {
+                $padding-left: 0;
+            }
+
+            .#{$prefix}#{$cls-ui}-mc {
+                padding: $padding-top $padding-right $padding-bottom $padding-left;
+            }
+        }
+
+        @if $include-ie {
+            // framed components in ie7 strict mode suffer from an obscure bug that causes the tl and bl framing elements to
+            // be shrink-wrapped to the width of their contents.  This hack forces the elements' widths to fit to their parent
+            .#{$prefix}strict .#{$prefix}ie7 {
+                .#{$prefix}#{$cls-ui}-tl,
+                .#{$prefix}#{$cls-ui}-bl {
+                    position: relative;
+                    right: 0;
+                }
+            }
+        }
+    }
+}
+:@has_childrenT:@children[o:Sass::Tree::FunctionNode:
+@name"pad;i;T;	[o:Sass::Tree::VariableNode;"radius:@guarded0:
+@expro:Sass::Script::Funcall
+;"boxmax;i:@keywords{ :@options{ :
+@args[o:Sass::Script::Variable	;"radius:@underscored_name"radius;i;@;i;	[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;"radius;0;o;
+;"parseint;i;{ ;{ ;[o;	;"radius;"radius;i;@;i;	[ ;@u:Sass::Tree::IfNodeˆ[o:Sass::Script::Operation
+:@operator:gte:@operand2o:Sass::Script::Number:@original"10:@denominator_units[ :@valuei:
+@linei	:@numerator_units[ :@options{ :@operand1o:Sass::Script::Variable	:
+@name"radius:@underscored_name"radius;i	;@;i	;@u:Sass::Tree::IfNodeÃ[00[o:Sass::Tree::ReturnNode	:
+@expro:Sass::Script::Operation
+:@operator:	plus:@operand2o:Sass::Script::Variable	:
+@name"radius:@underscored_name"radius:
+@linei:@options{ :@operand1o:Sass::Script::String	:
+@type:string:@value"0;i;@;i;@;i:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets[o:Sass::Tree::ReturnNode	:
+@expro;	;"radius;"radius;i
+;{ ;i
+:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;@;[[o;;"radius;"radius;{ 0o:Sass::Tree::MixinDefNode;"x-frame;i;T;	[o;;"cls-ui;0;o;	;"cls;"cls;i;{ ;i;	[ ;@u;Y[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@linei:@options{ :@operand1o:Sass::Script::Variable	:
+@name"ui:@underscored_name"ui;i;@	;i;@	0[o:Sass::Tree::VariableNode;"cls-ui:@guarded0:
+@expro; 
+;:	plus;o;	;"ui;"ui;i;{ ;o; 
+;;;o;		;
+:string;"-;i;@;o;	;"cls;"cls;i;@;i;@;i;@;i:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;"vertical;0;o:Sass::Script::Bool:@valueF;i!;{ ;i!;	[ ;@u;•[o:Sass::Script::Operation
+:@operator:or:@operand2o; 
+;:eq;o:Sass::Script::String	:
+@type:identifier:@value"
+right:
+@linei":@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-direction:@underscored_name"background_direction;i";@
+;i";@
+;o; 
+;;	;o;
+	;;;"	left;i";@
+;o;	;"background-direction;"background_direction;i";@
+;i";@
+;i";@
+0[o:Sass::Tree::VariableNode;"vertical:@guarded0:
+@expro:Sass::Script::Bool;T;i#;{ ;i#:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;"frame-top;0;o;
+;"max;i&;{ ;{ ;[o;
+;"top;i&;{ ;@A;[o;	;"border-radius;"border_radius;i&;@Ao;
+;"
+right;i&;{ ;@A;[o;	;"border-radius;"border_radius;i&;@A;i&;	[ ;@o;;"frame-right;0;o;
+;"max;i';{ ;{ ;[o;
+;"
+right;i';{ ;@W;[o;	;"border-radius;"border_radius;i';@Wo;
+;"bottom;i';{ ;@W;[o;	;"border-radius;"border_radius;i';@W;i';	[ ;@o;;"frame-bottom;0;o;
+;"max;i(;{ ;{ ;[o;
+;"bottom;i(;{ ;@m;[o;	;"border-radius;"border_radius;i(;@mo;
+;"	left;i(;{ ;@m;[o;	;"border-radius;"border_radius;i(;@m;i(;	[ ;@o;;"frame-left;0;o;
+;"max;i);{ ;{ ;[o;
+;"	left;i);{ ;@~;[o;	;"border-radius;"border_radius;i);@~o;
+;"top;i);{ ;@~;[o;	;"border-radius;"border_radius;i);@~;i);	[ ;@o;;"padding-top;0;o:Sass::Script::Number:@original"0:@denominator_units[ ;i ;i+:@numerator_units[ ;{ ;i+;	[ ;@o;;"padding-right;0;o;;"0;@ì;i ;i,;[ ;{ ;i,;	[ ;@o;;"padding-bottom;0;o;;"0;@ì;i ;i-;[ ;{ ;i-;	[ ;@o;;"padding-left;0;o;;"0;@ì;i ;i.;[ ;{ ;i.;	[ ;@u;à[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@linei0:@options{ :@operand1o:Sass::Script::Variable	:
+@name"padding:@underscored_name"padding;i0;@	;i0;@	u:Sass::Tree::IfNode”[00[	o:Sass::Tree::VariableNode:
+@name"padding-top:@guarded0:
+@expro:Sass::Script::Funcall
+;"top:
+@linei7:@keywords{ :@options{ :
+@args[o:Sass::Script::Variable	;"padding:@underscored_name"padding;
+i7;@;
+i7:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso; ;"padding-right;0;o;	
+;"
+right;
+i8;{ ;{ ;[o;	;"padding;"padding;
+i8;@;
+i8;[ ;@o; ;"padding-bottom;0;o;	
+;"bottom;
+i9;{ ;{ ;[o;	;"padding;"padding;
+i9;@%;
+i9;[ ;@o; ;"padding-left;0;o;	
+;"	left;
+i:;{ ;{ ;[o;	;"padding;"padding;
+i:;@0;
+i:;[ ;@[	o:Sass::Tree::VariableNode;"padding-top:@guarded0:
+@expro; 
+;:
+minus;o:Sass::Script::Funcall
+;"top;i1:@keywords{ ;{ :
+@args[o;	;"border-width;"border_width;i1;@;o;	;"frame-top;"frame_top;i1;@;i1;@;i1:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;"padding-right;0;o; 
+;;;o;
+;"
+right;i2;{ ;{ ;[o;	;"border-width;"border_width;i2;@';o;	;"frame-right;"frame_right;i2;@';i2;@';i2;[ ;@o;;"padding-bottom;0;o; 
+;;;o;
+;"bottom;i3;{ ;{ ;[o;	;"border-width;"border_width;i3;@6;o;	;"frame-bottom;"frame_bottom;i3;@6;i3;@6;i3;[ ;@o;;"padding-left;0;o; 
+;;;o;
+;"	left;i4;{ ;{ ;[o;	;"border-width;"border_width;i4;@E;o;	;"frame-left;"frame_left;i4;@E;i4;@E;i4;[ ;@u;Ñ[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Variable	:
+@name"frame-top:@underscored_name"frame_top:
+@linei=:@options{ :@operand1o;		;
+"padding-top;"padding_top;i=;@
+;i=;@
+0[o:Sass::Tree::VariableNode;
+"padding-top:@guarded0:
+@expro; 
+;:
+minus;o:Sass::Script::Funcall
+;
+"top;i>:@keywords{ ;{ :
+@args[o;		;
+"border-width;"border_width;i>;@;o;		;
+"frame-top;"frame_top;i>;@;i>;@;i>:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;î[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Variable	:
+@name"frame-right:@underscored_name"frame_right:
+@linei@:@options{ :@operand1o;		;
+"padding-right;"padding_right;i@;@
+;i@;@
+0[o:Sass::Tree::VariableNode;
+"padding-right:@guarded0:
+@expro; 
+;:
+minus;o:Sass::Script::Funcall
+;
+"
+right;iA:@keywords{ ;{ :
+@args[o;		;
+"border-width;"border_width;iA;@;o;		;
+"frame-right;"frame_right;iA;@;iA;@;iA:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;ú[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Variable	:
+@name"frame-bottom:@underscored_name"frame_bottom:
+@lineiC:@options{ :@operand1o;		;
+"padding-bottom;"padding_bottom;iC;@
+;iC;@
+0[o:Sass::Tree::VariableNode;
+"padding-bottom:@guarded0:
+@expro; 
+;:
+minus;o:Sass::Script::Funcall
+;
+"bottom;iD:@keywords{ ;{ :
+@args[o;		;
+"border-width;"border_width;iD;@;o;		;
+"frame-bottom;"frame_bottom;iD;@;iD;@;iD:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;å[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Variable	:
+@name"frame-left:@underscored_name"frame_left:
+@lineiF:@options{ :@operand1o;		;
+"padding-left;"padding_left;iF;@
+;iF;@
+0[o:Sass::Tree::VariableNode;
+"padding-left:@guarded0:
+@expro; 
+;:
+minus;o:Sass::Script::Funcall
+;
+"	left;iG:@keywords{ ;{ :
+@args[o;		;
+"border-width;"border_width;iG;@;o;		;
+"frame-left;"frame_left;iG;@;iG;@;iG:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso:Sass::Tree::RuleNode:
+@rule[".o;	;"prefix;"prefix;iJ;{ o;	;"cls-ui;"cls_ui;iJ;{ ;iJ;T;	[
+u;0[o:Sass::Script::Variable	:
+@name"supports-border-radius:@underscored_name"supports_border_radius:
+@lineiK:@options{ 0[u:Sass::Tree::IfNodeò[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Number:@original"2:@denominator_units[ :@valuei:
+@lineiL:@numerator_units[ :@options{ :@operand1o:Sass::Script::Funcall
+:
+@name"length;iL:@keywords{ ;@:
+@args[o:Sass::Script::Variable	;"border-radius:@underscored_name"border_radius;iL;@;iL;@u:Sass::Tree::IfNode(
+[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Number:@original"3:@denominator_units[ :@valuei:
+@lineiO:@numerator_units[ :@options{ :@operand1o:Sass::Script::Funcall
+:
+@name"length;iO:@keywords{ ;@:
+@args[o:Sass::Script::Variable	;"border-radius:@underscored_name"border_radius;iO;@;iO;@u:Sass::Tree::IfNode[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Number:@original"4:@denominator_units[ :@valuei	:
+@lineiS:@numerator_units[ :@options{ :@operand1o:Sass::Script::Funcall
+:
+@name"length;iS:@keywords{ ;@:
+@args[o:Sass::Script::Variable	;"border-radius:@underscored_name"border_radius;iS;@;iS;@u:Sass::Tree::IfNodeu[00[o:Sass::Tree::MixinNode:
+@name"border-radius:
+@lineiY:@keywords{ :@children[ :@options{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets:
+@args[o:Sass::Script::Variable	;"border-radius:@underscored_name"border_radius;iY;
+{ [	o:Sass::Tree::MixinNode;"border-top-left-radius;iT;{ :@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;[o;
+;"nth;iT;{ ;{ ;[o;	;"border-radius;"border_radius;iT;@ o;	;
+"1;@	;i;iT;[ ;@ o;;"border-top-right-radius;iU;{ ;[ ;@;[o;
+;"nth;iU;{ ;{ ;[o;	;"border-radius;"border_radius;iU;@0o;	;
+"2;@	;i;iU;[ ;@0o;;"border-bottom-right-radius;iV;{ ;[ ;@;[o;
+;"nth;iV;{ ;{ ;[o;	;"border-radius;"border_radius;iV;@@o;	;
+"3;@	;i;iV;[ ;@@o;;"border-bottom-left-radius;iW;{ ;[ ;@;[o;
+;"nth;iW;{ ;{ ;[o;	;"border-radius;"border_radius;iW;@Po;	;
+"4;@	;i	;iW;[ ;@P[o:Sass::Tree::MixinNode;"border-top-left-radius;iP;{ :@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;[o;
+;"nth;iP;{ ;{ ;[o;	;"border-radius;"border_radius;iP;@ o;	;
+"1;@	;i;iP;[ ;@ o;;"border-top-right-radius;iQ;{ ;[ ;@;[o;
+;"nth;iQ;{ ;{ ;[o;	;"border-radius;"border_radius;iQ;@0o;	;
+"2;@	;i;iQ;[ ;@0o;;"border-bottom-right-radius;iR;{ ;[ ;@;[o;
+;"nth;iR;{ ;{ ;[o;	;"border-radius;"border_radius;iR;@@o;	;
+"3;@	;i;iR;[ ;@@[o:Sass::Tree::MixinNode;"border-top-left-radius;iM;{ :@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;[o;
+;"nth;iM;{ ;{ ;[o;	;"border-radius;"border_radius;iM;@ o;	;
+"1;@	;i;iM;[ ;@ o;;"border-top-right-radius;iN;{ ;[ ;@;[o;
+;"nth;iN;{ ;{ ;[o;	;"border-radius;"border_radius;iN;@0o;	;
+"2;@	;i;iN;[ ;@0o:Sass::Tree::PropNode;["padding:@prop_syntax:new;o:Sass::Script::List	;[	o;	;"padding-top;"padding_top;i\;{ o;	;"padding-right;"padding_right;i\;@∆o;	;"padding-bottom;"padding_bottom;i\;@∆o;	;"padding-left;"padding_left;i\;@∆;i\:@separator:
+space;@∆;i\;	[ :
+@tabsi ;@o;";["border-width;#;$;o;	;"border-width;"border_width;i];{ ;i];	[ ;(i ;@o;";["border-style;#;$;o:Sass::Script::String:
+@type:identifier;"
+solid;i^;	[ ;(i ;@u;√[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@linei_:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;i_;@	;i_;@	0[u:Sass::Tree::IfNode≠[o:Sass::Script::Operation
+:@operator:and:@operand2o; 
+;:neq;o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@linei`:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-gradient:@underscored_name"background_gradient;i`;@
+;i`;@
+;o;	;"supports-gradients;"supports_gradients;i`;@
+;i`;@
+u:Sass::Tree::IfNodeç[00[o:Sass::Tree::PropNode:
+@name["background-color:@prop_syntax:new:@valueo:Sass::Script::Variable	;"background-color:@underscored_name"background_color:
+@lineid:@options{ ;id:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets[o:Sass::Tree::MixinNode;"background-gradient;ia:@keywords{ :@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets:
+@args[o;	;"background-color;"background_color;ia;{ o;	;"background-gradient;"background_gradient;ia;@o;	;"background-direction;"background_direction;ia;@;(i ;@u;‰[o:Sass::Script::Operation
+:@operator:or:@operand2o:Sass::Script::Variable	:
+@name"compile-all:@underscored_name"compile_all:
+@lineii:@options{ :@operand1o:!Sass::Script::UnaryOperation	;:not:@operando;		;
+"supports-gradients;"supports_gradients;ii;@
+;ii;@
+;ii;@
+0[o:Sass::Tree::RuleNode:
+@rule[".o;		;
+"prefix;"prefix;ij;{ "nlg;ij:@has_childrenT:@children[o;;[	".o;		;
+"prefix;"prefix;ik;{ o;		;
+"cls-ui;"cls_ui;ik;{ "-mc;ik;T;[u:Sass::Tree::IfNode‘[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@lineil:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-gradient:@underscored_name"background_gradient;il;@	;il;@	0[o:Sass::Tree::PropNode;["background-image:@prop_syntax:new;o:Sass::Script::Funcall
+;"theme-background-image;im:@keywords{ ;{ :
+@args[	o;	;"theme-name;"theme_name;im;@o:&Sass::Script::StringInterpolation
+:@aftero;
+;o;		;
+:string;"-bg.gif;im;@;im:	@mido;	;"cls-ui;"cls_ui;im;@;@:@beforeo;		;
+;;"/;im;@;im;o;	;"cls;"cls;im;@;@;o;		;
+;;" ;im;@o:Sass::Script::Bool;F;im;@o;	;" relative-image-path-for-uis;" relative_image_path_for_uis;im;@;im:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;D[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@lineio:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;io;@	;io;@	0[o:Sass::Tree::PropNode;["background-color:@prop_syntax:new;o;	;"background-color;"background_color;ip;{ ;ip:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets:
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;i ;@(u;ì:[o:Sass::Script::Operation
+:@operator:or:@operand2o:Sass::Script::Variable	:
+@name"compile-all:@underscored_name"compile_all:
+@lineiv:@options{ :@operand1o:!Sass::Script::UnaryOperation	;:not:@operando;		;
+"supports-border-radius;"supports_border_radius;iv;@
+;iv;@
+;iv;@
+0[o:Sass::Tree::RuleNode:
+@rule[".o;		;
+"prefix;"prefix;iw;{ "nbr;iw:@has_childrenT:@children[o;;[".o;		;
+"prefix;"prefix;ix;{ o;		;
+"cls-ui;"cls_ui;ix;{ ;ix;T;[o:Sass::Tree::PropNode;
+["padding:@prop_syntax:new:@valueo:Sass::Script::String:
+@type:identifier;"0 !important;iy;[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;
+["border-width;;;o;;;;"0 !important;iz;[ ;i ;@+o:Sass::Tree::MixinNode;
+"border-radius;i{:@keywords{ ;[ ;@+:
+@args[o:Sass::Script::Number:@original"0px:@denominator_units[ ;i ;i{:@numerator_units["px;{ u:Sass::Tree::IfNodeû[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@linei|:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;i|;@	;i|;@	u:Sass::Tree::IfNode`[00[o:Sass::Tree::PropNode:
+@name["background:@prop_syntax:new:@valueo:Sass::Script::String:
+@type:identifier;	"	#fff:
+@linei{:@children[ :
+@tabsi :@options{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets[o:Sass::Tree::PropNode;["background-color:@prop_syntax:new;o;	;
+;;"transparent;i}:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso:Sass::Tree::VariableNode;
+"	type:@guarded0:
+@expro;	;:string;"100;i~;{ ;i~;[ ;@+u;([o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Bool:@valueT:
+@linei:@options{ :@operand1o:Sass::Script::Variable	:
+@name"
+table:@underscored_name"
+table;i;@;i;@0[o:Sass::Tree::VariableNode;"	type:@guarded0:
+@expro:Sass::Script::String	:
+@type:string;
+"110;iÄ;{ ;iÄ:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;);
+"direction;*0;+o;	;;,;"100;iÇ;{ ;iÇ;[ ;@+u;([o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Bool:@valueT:
+@lineiÉ:@options{ :@operand1o:Sass::Script::Variable	:
+@name"vertical:@underscored_name"vertical;iÉ;@;iÉ;@0[o:Sass::Tree::VariableNode;"direction:@guarded0:
+@expro:Sass::Script::String	:
+@type:string;
+"110;iÑ;{ ;iÑ:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;);
+"	left;*0;+o; 
+;:	plus;o;	;;,;"px;iá;{ ;o; 
+;;-;o:Sass::Script::Funcall
+;
+"pad;iá;"{ ;@S;#[o;.
+;
+"
+right;iá;"{ ;@S;#[o;		;
+"border-radius;"border_radius;iá;@S;o; 
+;;-;o;.
+;
+"pad;iá;"{ ;@S;#[o;.
+;
+"top;iá;"{ ;@S;#[o;		;
+"border-radius;"border_radius;iá;@S;o;		;
+"	type;"	type;iá;@S;iá;@S;iá;@S;iá;@S;iá;[ ;@+o;);
+"top;*0;+o; 
+;;-;o;	;;,;"px;ià;{ ;o; 
+;;-;o;.
+;
+"pad;ià;"{ ;@u;#[o;.
+;
+"	left;ià;"{ ;@u;#[o;		;
+"border-radius;"border_radius;ià;@u;o; 
+;;-;o;.
+;
+"pad;ià;"{ ;@u;#[o;.
+;
+"bottom;ià;"{ ;@u;#[o;		;
+"border-radius;"border_radius;ià;@u;o;		;
+"direction;"direction;ià;@u;ià;@u;ià;@u;ià;@u;ià;[ ;@+o;;
+["background-position;;;o:Sass::Script::List	;[o;.
+;
+"unquote;iâ;"{ ;{ ;#[o;		;
+"	left;"	left;iâ;@ïo;.
+;
+"unquote;iâ;"{ ;@ï;#[o;		;
+"top;"top;iâ;@ï;iâ:@separator:
+space;@ï;iâ;[ ;i ;@+;i ;@+o;;[".o;		;
+"prefix;"prefix;iå;{ o;		;
+"cls-ui;"cls_ui;iå;{ "-tl,
+            .o;		;
+"prefix;"prefix;iç;{ o;		;
+"cls-ui;"cls_ui;iç;{ "-bl,
+            .o;		;
+"prefix;"prefix;ié;{ o;		;
+"cls-ui;"cls_ui;ié;{ "-tr,
+            .o;		;
+"prefix;"prefix;iè;{ o;		;
+"cls-ui;"cls_ui;iè;{ "-br,
+            .o;		;
+"prefix;"prefix;iê;{ o;		;
+"cls-ui;"cls_ui;iê;{ "-tc,
+            .o;		;
+"prefix;"prefix;ië;{ o;		;
+"cls-ui;"cls_ui;ië;{ "-bc,
+            .o;		;
+"prefix;"prefix;ií;{ o;		;
+"cls-ui;"cls_ui;ií;{ "-ml,
+            .o;		;
+"prefix;"prefix;iì;{ o;		;
+"cls-ui;"cls_ui;iì;{ "-mr;iì;T;[o;;
+["	zoom;;;o;;;;"1;iî;[ ;i ;@+u;(È[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"transparent:
+@lineiñ:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;iñ;@	;iñ;@	0[o:Sass::Tree::PropNode;["background-image:@prop_syntax:new;o:Sass::Script::Funcall
+;"theme-background-image;ió:@keywords{ ;{ :
+@args[	o;	;"theme-name;"theme_name;ió;@o:&Sass::Script::StringInterpolation
+:@aftero;
+;o;		;
+:string;"-corners.gif;ió;@;ió:	@mido;	;"cls-ui;"cls_ui;ió;@;@:@beforeo;		;
+;;"/;ió;@;ió;o;	;"cls;"cls;ió;@;@;o;		;
+;;" ;ió;@o:Sass::Script::Bool;F;ió;@o;	;" relative-image-path-for-uis;" relative_image_path_for_uis;ió;@;ió:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;i ;@+u;(l[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::Bool:@valueT:
+@lineiõ:@options{ :@operand1o:Sass::Script::Variable	:
+@name"vertical:@underscored_name"vertical;iõ;@;iõ;@u:Sass::Tree::IfNodeÏ[00[o:Sass::Tree::RuleNode:
+@rule[".o:Sass::Script::Variable	:
+@name"prefix:@underscored_name"prefix:
+@lineiß:@options{ o;	;"cls-ui;	"cls_ui;
+iß;{ "-ml,
+                .o;	;"prefix;	"prefix;
+i®;{ o;	;"cls-ui;	"cls_ui;
+i®;{ "-mr;
+i®:@has_childrenT:@children[o:Sass::Tree::PropNode;["	zoom:@prop_syntax:new:@valueo:Sass::Script::String:
+@type:identifier;"1;
+i©;[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu:Sass::Tree::IfNodep[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"transparent:
+@linei´:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;i´;@	;i´;@	0[o:Sass::Tree::PropNode;["background-image:@prop_syntax:new;o:Sass::Script::Funcall
+;"theme-background-image;i¨:@keywords{ ;{ :
+@args[	o;	;"theme-name;"theme_name;i¨;@o:&Sass::Script::StringInterpolation
+:@aftero;
+;o;		;
+:string;"-sides.gif;i¨;@;i¨:	@mido;	;"cls-ui;"cls_ui;i¨;@;@:@beforeo;		;
+;;"/;i¨;@;i¨;o;	;"cls;"cls;i¨;@;@;o;		;
+;;" ;i¨;@o:Sass::Script::Bool;F;i¨;@o;	;" relative-image-path-for-uis;" relative_image_path_for_uis;i¨;@;i¨:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;["background-position;;;o;	;
+;;"0 0;i≠;[ ; i ;@,u:Sass::Tree::IfNode.[o:Sass::Script::Operation
+:@operator:eq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"	null:
+@lineiÆ:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-gradient:@underscored_name"background_gradient;iÆ;@	;iÆ;@	0[o:Sass::Tree::PropNode;["background-repeat:@prop_syntax:new;o;	;
+;;"repeat-y;iØ:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheets;i ;@#[o:Sass::Tree::RuleNode:
+@rule[".o;	;"prefix;"prefix;iú;{ o;	;"cls-ui;"cls_ui;iú;{ "-tc,
+                .o;	;"prefix;"prefix;iù;{ o;	;"cls-ui;"cls_ui;iù;{ "-bc;iù:@has_childrenT:@children[o:Sass::Tree::PropNode;["	zoom:@prop_syntax:new;
+o:Sass::Script::String:
+@type:identifier;
+"1;iû;[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;p[o:Sass::Script::Operation
+:@operator:neq:@operand2o:Sass::Script::String	:
+@type:identifier:@value"transparent:
+@linei†:@options{ :@operand1o:Sass::Script::Variable	:
+@name"background-color:@underscored_name"background_color;i†;@	;i†;@	0[o:Sass::Tree::PropNode;["background-image:@prop_syntax:new;o:Sass::Script::Funcall
+;"theme-background-image;i°:@keywords{ ;{ :
+@args[	o;	;"theme-name;"theme_name;i°;@o:&Sass::Script::StringInterpolation
+:@aftero;
+;o;		;
+:string;"-sides.gif;i°;@;i°:	@mido;	;"cls-ui;"cls_ui;i°;@;@:@beforeo;		;
+;;"/;i°;@;i°;o;	;"cls;"cls;i°;@;@;o;		;
+;;" ;i°;@o:Sass::Script::Bool;F;i°;@o;	;" relative-image-path-for-uis;" relative_image_path_for_uis;i°;@;i°:@children[ :
+@tabsi ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;["background-position;;;o;	;
+;;"0 0;i¢;[ ; i ;@,o;;["background-repeat;;;o;	;
+;;"repeat-x;i£;[ ; i ;@,;i ;@*o;);
+"padding-top;*0;+o; 
+;;-;o;.
+;
+"top;iµ;"{ ;{ ;#[o;		;
+"border-width;"border_width;iµ;@¸;o; 
+;:
+minus;o;		;
+"frame-top;"frame_top;iµ;@¸;o;		;
+"padding-top;"padding_top;iµ;@¸;iµ;@¸;iµ;@¸;iµ;[ ;@+o;);
+"padding-right;*0;+o; 
+;;-;o;.
+;
+"
+right;i∂;"{ ;{ ;#[o;		;
+"border-width;"border_width;i∂;@;o; 
+;;2;o;		;
+"frame-right;"frame_right;i∂;@;o;		;
+"padding-right;"padding_right;i∂;@;i∂;@;i∂;@;i∂;[ ;@+o;);
+"padding-bottom;*0;+o; 
+;;-;o;.
+;
+"bottom;i∑;"{ ;{ ;#[o;		;
+"border-width;"border_width;i∑;@";o; 
+;;2;o;		;
+"frame-bottom;"frame_bottom;i∑;@";o;		;
+"padding-bottom;"padding_bottom;i∑;@";i∑;@";i∑;@";i∑;[ ;@+o;);
+"padding-left;*0;+o; 
+;;-;o;.
+;
+"	left;i∏;"{ ;{ ;#[o;		;
+"border-width;"border_width;i∏;@5;o; 
+;;2;o;		;
+"frame-left;"frame_left;i∏;@5;o;		;
+"padding-left;"padding_left;i∏;@5;i∏;@5;i∏;@5;i∏;[ ;@+u;(9[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Number:@original"0:@denominator_units[ :@valuei :
+@lineiª:@numerator_units[ :@options{ :@operand1o:Sass::Script::Variable	:
+@name"padding-top:@underscored_name"padding_top;iª;@;iª;@0[o:Sass::Tree::VariableNode;"padding-top:@guarded0:
+@expro;	;
+"0;@	;i ;iº;[ ;{ ;iº:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;(?[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Number:@original"0:@denominator_units[ :@valuei :
+@lineiæ:@numerator_units[ :@options{ :@operand1o:Sass::Script::Variable	:
+@name"padding-right:@underscored_name"padding_right;iæ;@;iæ;@0[o:Sass::Tree::VariableNode;"padding-right:@guarded0:
+@expro;	;
+"0;@	;i ;iø;[ ;{ ;iø:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;(B[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Number:@original"0:@denominator_units[ :@valuei :
+@linei¡:@numerator_units[ :@options{ :@operand1o:Sass::Script::Variable	:
+@name"padding-bottom:@underscored_name"padding_bottom;i¡;@;i¡;@0[o:Sass::Tree::VariableNode;"padding-bottom:@guarded0:
+@expro;	;
+"0;@	;i ;i¬;[ ;{ ;i¬:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetsu;(<[o:Sass::Script::Operation
+:@operator:lt:@operand2o:Sass::Script::Number:@original"0:@denominator_units[ :@valuei :
+@lineiƒ:@numerator_units[ :@options{ :@operand1o:Sass::Script::Variable	:
+@name"padding-left:@underscored_name"padding_left;iƒ;@;iƒ;@0[o:Sass::Tree::VariableNode;"padding-left:@guarded0:
+@expro;	;
+"0;@	;i ;i≈;[ ;{ ;i≈:@children[ ;{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso;;[	".o;		;
+"prefix;"prefix;i»;{ o;		;
+"cls-ui;"cls_ui;i»;{ "-mc;i»;T;[o;;
+["padding;;;o;/	;[	o;		;
+"padding-top;"padding_top;i…;{ o;		;
+"padding-right;"padding_right;i…;@[o;		;
+"padding-bottom;"padding_bottom;i…;@[o;		;
+"padding-left;"padding_left;i…;@[;i…;0;1;@[;i…;[ ;i ;@+;i ;@+;i ;@+u;(j[o:Sass::Script::Variable	:
+@name"include-ie:@underscored_name"include_ie:
+@lineiÕ:@options{ 0[o:Sass::Tree::CommentNode:@silenti :@value"Ê/* framed components in ie7 strict mode suffer from an obscure bug that causes the tl and bl framing elements to
+ * be shrink-wrapped to the width of their contents.  This hack forces the elements' widths to fit to their parent */;iŒ:@lines[ :@children[ :
+@loud0;	{:importero: Sass::Importers::Filesystem:
+@root"~/home/a.konovalov/dev/Docs/lib/Mojolicious/Plugin/Docs/public/template/resources/sass/../../extjs/resources/themes/stylesheetso:Sass::Tree::RuleNode:
+@rule[
+".o; 	;"prefix;"prefix;i–;	{ "strict .o; 	;"prefix;"prefix;i–;	{ "ie7;i–:@has_childrenT;[o;;[".o; 	;"prefix;"prefix;i—;	{ o; 	;"cls-ui;"cls_ui;i—;	{ "-tl,
+                .o; 	;"prefix;"prefix;i“;	{ o; 	;"cls-ui;"cls_ui;i“;	{ "-bl;i“;T;[o:Sass::Tree::PropNode;["position:@prop_syntax:new;o:Sass::Script::String:
+@type:identifier;"relative;i”;[ :
+@tabsi ;	@o;;["
+right;;;o;;;;"0;i‘;[ ;i ;	@;i ;	@;i ;	@;@;[[o;;"cls;"cls;{ 0[o;;"ui;"ui;@Áo;)	;*;+;"	null;i;@Á[o;;"border-radius;"border_radius;@Áo;;"0px;[ ;i ;i;["px;@Á[o;;"border-width;"border_width;@Áo;;"0px;[ ;i ;i;["px;@Á[o;;"padding;"padding;@Áo;)	;*;+;"	null;i;@Á[o;;"background-color;"background_color;@Áo;)	;*;+;"	null;i;@Á[o;;"background-gradient;"background_gradient;@Áo;)	;*;+;"	null;i;@Á[o;;"
+table;"
+table;@Áo;;F;i;@Á[o;;"background-direction;"background_direction;@Áo;)	;*;+;"top;i;@Á;@

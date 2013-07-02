@@ -4,7 +4,44 @@ use Mojo::Base 'Mojolicious::Plugin';
 our $VERSION = '0.01';
 
 sub register {
-  my ($self, $app) = @_;
+    my ( $self, $app, $config ) = @_;
+
+    my $r = $app->routes;
+
+    my $base = __FILE__;
+    $base =~ s/\.pm//;
+    require File::Spec;
+
+    push @{ $app->renderer->paths }, File::Spec->catdir( $base, 'templates' );
+    push @{ $app->static->paths },   File::Spec->catdir( $base, 'public' );
+
+    my $prefix_url = $config->{prefix_url} || '/url';
+    my $dir = $config->{dir};
+
+    my $docs = $r->bridge($prefix_url);
+
+    $docs->get(
+        '/' => sub {
+            my $self = shift;
+
+            my $moduls = $self->param('moduls');
+            my $text   = 'Hello! See your docs!';
+
+            my $json = {
+                msg     => $text,
+                success => Mojo::JSON->true,
+            };
+
+            if ($moduls) {
+                $json->{moduls} = $moduls;
+            }
+
+            $self->respond_to(
+                json => {json => $json},
+                html => {text => $text},
+            );
+        }
+    );
 }
 
 1;
